@@ -63,6 +63,10 @@ namespace BLE_Serial_Terminal
 
             this.cBoxAutoScroll.Checked = true;
 
+            //Log font: monospaced, size remembered; Ctrl + mouse wheel changes it
+            setLogFontSize(Properties.Settings.Default.logfontsize);
+            this.textBoxReceived.MouseWheel += textBoxReceived_MouseWheel;
+
             //Device Candidate Combo Box
             this.cmbBoxDevice.Items.Clear();
             this.cmbBoxDevice.SelectedIndex = -1;
@@ -361,6 +365,11 @@ namespace BLE_Serial_Terminal
             }
         }
 
+        // The peripheral sends UTF-8 (e.g. "°C"). Encoding.Default is the ANSI code
+        // page and turned that into "Â°C". One decoder for the whole connection, so a
+        // multi-byte character split across two notifications is still decoded right.
+        private readonly Decoder utf8Decoder = new UTF8Encoding(false).GetDecoder();
+
         //Processing upon receiving a Notify
         void characteristicBleDevice(GattCharacteristic sender, GattValueChangedEventArgs args)
         {
@@ -368,7 +377,13 @@ namespace BLE_Serial_Terminal
             var streamNotify = args.CharacteristicValue.AsStream();
             //PrintFromStream(streamNotify);
             byte[] byte_text = StreamToBytes(streamNotify);
-            string string_text = Encoding.Default.GetString(byte_text);
+            string string_text;
+            lock (utf8Decoder)
+            {
+                char[] chars = new char[utf8Decoder.GetCharCount(byte_text, 0, byte_text.Length)];
+                utf8Decoder.GetChars(byte_text, 0, byte_text.Length, chars, 0);
+                string_text = new string(chars);
+            }
             string_text = string_text.TrimEnd('\r', '\n');
             Debug.WriteLine(string_text);
             this.Invoke(new MethodInvoker(delegate
@@ -439,7 +454,7 @@ namespace BLE_Serial_Terminal
             }
             str += linebreaks[this.cmbBoxLBSend.SelectedIndex];
             Debug.WriteLine(str);
-            byte[] byte_str = System.Text.Encoding.ASCII.GetBytes(str);
+            byte[] byte_str = System.Text.Encoding.UTF8.GetBytes(str);
             try
             {
                 await cRX.WriteValueAsync(byte_str.AsBuffer());
@@ -454,7 +469,7 @@ namespace BLE_Serial_Terminal
         /*private async void TrialSend(string str)
         {
             if (str == "") return;
-            byte[] byte_str = System.Text.Encoding.ASCII.GetBytes(str);
+            byte[] byte_str = System.Text.Encoding.UTF8.GetBytes(str);
             try
             {
                 await cRX.WriteValueAsync(byte_str.AsBuffer());
@@ -506,6 +521,25 @@ namespace BLE_Serial_Terminal
             }
         }
 
+        private const float LogFontMin = 7F;
+        private const float LogFontMax = 28F;
+
+        private void setLogFontSize(float size)
+        {
+            if (size < LogFontMin) size = LogFontMin;
+            if (size > LogFontMax) size = LogFontMax;
+            Font old = this.textBoxReceived.Font;
+            this.textBoxReceived.Font = new Font("Consolas", size, FontStyle.Regular, GraphicsUnit.Point);
+            if (old != null) old.Dispose();
+        }
+
+        private void textBoxReceived_MouseWheel(object sender, MouseEventArgs e)
+        {
+            if ((Control.ModifierKeys & Keys.Control) != Keys.Control) return; // plain wheel scrolls as usual
+            setLogFontSize(this.textBoxReceived.Font.Size + (e.Delta > 0 ? 1F : -1F));
+            if (e is HandledMouseEventArgs h) h.Handled = true;
+        }
+
         private void clearLog_clicked(object sender, EventArgs e)
         {
             this.textBoxReceived.Clear();
@@ -530,7 +564,7 @@ namespace BLE_Serial_Terminal
 
             if (saveFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                File.WriteAllText(saveFileDialog1.FileName, this.textBoxReceived.Text);
+                File.WriteAllText(saveFileDialog1.FileName, this.textBoxReceived.Text, new UTF8Encoding(false));
             }
         }
 
@@ -541,6 +575,7 @@ namespace BLE_Serial_Terminal
             Properties.Settings.Default.linebreaks = this.cmbBoxLBSend.SelectedIndex;
             Properties.Settings.Default.localecho = this.cBoxLocalEcho.Checked;
             Properties.Settings.Default.timestamp = this.cBoxTimeStamp.Checked;
+            Properties.Settings.Default.logfontsize = this.textBoxReceived.Font.Size;
 
             Properties.Settings.Default.commandstring = this.custumbuttons[0].Text;
             for (int i = 1; i < NumButtons; i++)

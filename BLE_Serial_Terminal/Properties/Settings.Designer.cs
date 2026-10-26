@@ -94,5 +94,17 @@ namespace BLE_Serial_Terminal.Properties {
                 this["justinsert"] = value;
             }
         }
+
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("11")]
+        public float logfontsize {
+            get {
+                return ((float)(this["logfontsize"]));
+            }
+            set {
+                this["logfontsize"] = value;
+            }
+        }
     }
 }

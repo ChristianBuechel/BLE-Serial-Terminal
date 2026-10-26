@@ -214,13 +214,18 @@ namespace BLE_Serial_Terminal
             // 
             // textBoxReceived
             // 
+            this.textBoxReceived.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom)
+            | System.Windows.Forms.AnchorStyles.Left)
+            | System.Windows.Forms.AnchorStyles.Right)));
+            this.textBoxReceived.Font = new System.Drawing.Font("Consolas", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.textBoxReceived.WordWrap = false;
             this.textBoxReceived.BackColor = System.Drawing.SystemColors.ControlDarkDark;
             this.textBoxReceived.ForeColor = System.Drawing.SystemColors.Info;
             this.textBoxReceived.Location = new System.Drawing.Point(12, 240);
             this.textBoxReceived.Multiline = true;
             this.textBoxReceived.Name = "textBoxReceived";
             this.textBoxReceived.ReadOnly = true;
-            this.textBoxReceived.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
+            this.textBoxReceived.ScrollBars = System.Windows.Forms.ScrollBars.Both;
             this.textBoxReceived.Size = new System.Drawing.Size(677, 295);
             this.textBoxReceived.TabIndex = 18;
             // 
@@ -298,9 +303,10 @@ namespace BLE_Serial_Terminal
             this.Controls.Add(this.SelectBleDevice);
             this.Controls.Add(this.cmbBoxDevice);
             this.Controls.Add(this.btnSend);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Sizable;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
-            this.MaximizeBox = false;
+            this.MaximizeBox = true;
+            this.MinimumSize = new System.Drawing.Size(718, 589);
             this.Name = "Form1";
             this.Text = "BLE_Serial_Terminal";
             this.ResumeLayout(false);

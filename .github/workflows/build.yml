@@ -1,0 +1,23 @@
+# Builds BLE_Serial_Terminal.exe on a GitHub-hosted Windows runner.
+# The result is attached to each run as the artifact "BLE_Serial_Terminal"
+# (Actions tab -> run -> Artifacts).
+name: build
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: microsoft/setup-msbuild@v2
+      - name: Build (Release)
+        run: msbuild BLE_Serial_Terminal.sln -restore -p:Configuration=Release "-p:Platform=Any CPU"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: BLE_Serial_Terminal
+          path: |
+            BLE_Serial_Terminal/bin/Release/BLE_Serial_Terminal.exe
+            BLE_Serial_Terminal/bin/Release/BLE_Serial_Terminal.exe.config
