@@ -219,8 +219,8 @@ namespace BLE_Serial_Terminal
             | System.Windows.Forms.AnchorStyles.Right)));
             this.textBoxReceived.Font = new System.Drawing.Font("Consolas", 11F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.textBoxReceived.WordWrap = false;
-            this.textBoxReceived.BackColor = System.Drawing.SystemColors.ControlDarkDark;
-            this.textBoxReceived.ForeColor = System.Drawing.SystemColors.Info;
+            this.textBoxReceived.BackColor = System.Drawing.Color.Black;
+            this.textBoxReceived.ForeColor = System.Drawing.Color.White;
             this.textBoxReceived.Location = new System.Drawing.Point(12, 240);
             this.textBoxReceived.Multiline = true;
             this.textBoxReceived.Name = "textBoxReceived";
